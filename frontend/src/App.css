@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+.button {
+  all: unset;
+  background-color: #010101;
+  border-radius: 69px;
+  box-sizing: border-box;
+  height: 69px;
+  position: relative;
+  width: 225px;
+}
+
+.button .text {
+  /* -webkit-box-orient: vertical;
+  -webkit-line-clamp: 0; */
+  color: #d2d1d0;
+  display: -webkit-box;
+  font-family: "Fredoka-SemiBold", Helvetica;
+  font-size: 20px;
+  font-weight: 600;
+  left: 60px;
+  letter-spacing: 0;
+  line-height: 24.0px;
+  overflow: hidden;
+  position: absolute;
+  text-align: center;
+  text-overflow: ellipsis;
+  top: 21px;
+  white-space: nowrap;
+  width: 105px;
+}
