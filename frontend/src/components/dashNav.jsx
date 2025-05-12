@@ -1,4 +1,7 @@
 import React from "react";
+import Logo from "../assets/media/Logo(Nav).png";
+import EmailIcon from "../assets/media/Email Button.png";
+import NotificationIcon from "../assets/media/Notification Button.png";
 
 function DashNav({ userData }) {
   const { name, greetingMessage, greetingSubtext, avatarUrl } = userData;
@@ -8,11 +11,7 @@ function DashNav({ userData }) {
       <div className="px-6 py-4 flex flex-wrap md:flex-nowrap justify-between items-center gap-4">
         {/* Left Section: Logo & Title */}
         <div className="flex items-center gap-3">
-          <img
-            className="w-12 h-12"
-            src="src/assets/media/Logo(Nav).png"
-            alt="Logo"
-          />
+          <img className="w-12 h-12" src={Logo} alt="Logo" />
           <div className="text-black text-2xl font-bold font-['DM_Sans']">
             AcmeTrack
           </div>
@@ -31,17 +30,12 @@ function DashNav({ userData }) {
         {/* Right Section: Notifications and User */}
         <div className="flex items-center gap-6 ml-auto">
           {/* Notification Icons */}
-
           <img
             className="w-12 h-12"
-            src="src/assets/media/Notification Button.png"
-            alt="Logo"
+            src={NotificationIcon}
+            alt="Notifications"
           />
-          <img
-            className="w-12 h-12"
-            src="src/assets/media/Email Button.png"
-            alt="Logo"
-          />
+          <img className="w-12 h-12" src={EmailIcon} alt="Email" />
 
           {/* User Profile */}
           <div className="px-2.5 py-2 rounded-[10px] outline outline-1 outline-neutral-200 flex items-center gap-1.5">

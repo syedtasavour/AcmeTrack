@@ -1,16 +1,12 @@
 import React from "react";
-
+import Logo from "../assets/media/Logo(Nav).png";
 function Footer() {
   return (
     <div>
       <div className="w-full px-6 md:px-24 pt-10 pb-20 bg-gray-50 flex flex-col md:flex-row justify-between items-start gap-16">
         {/* Logo and Copyright */}
         <div className="inline-flex flex-col justify-start items-start gap-10">
-          <img
-            className="w-24 h-24"
-            src="src/assets/media/Logo(Nav).png"
-            alt="Logo"
-          />
+          <img className="w-24 h-24" src={Logo} alt="Logo" />
           <div className="text-zinc-600 text-sm font-normal font-['Fredoka'] leading-none">
             © 2025 AcmeTrack, Inc.
             <br />

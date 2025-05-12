@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import Logo from "../assets/media/Logo(Nav).png";
 function Header() {
   const navigate = useNavigate();
 
@@ -7,11 +8,7 @@ function Header() {
     <div className="w-full px-6 md:px-12 lg:px-24 h-16 flex justify-between items-center bg-white">
       {/* Logo */}
       <div className="flex items-center gap-2" onClick={() => navigate("/")}>
-        <img
-          className="w-12 h-12"
-          src="src/assets/media/Logo(Nav).png"
-          alt="Logo"
-        />
+        <img className="w-12 h-12" src={Logo} alt="Logo" />
         <div
           className="text-black text-2xl font-bold font-['DM_Sans'] leading-normal"
           onClick={() => navigate("/")}

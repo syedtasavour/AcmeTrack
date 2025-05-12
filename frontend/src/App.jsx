@@ -4,6 +4,7 @@ import {
   Routes,
   Route,
   useLocation,
+  Outlet,
 } from "react-router-dom";
 import LandingPage from "./Pages/landingPage/LandingPage";
 import SignUp from "./Pages/auth/SignUp.jsx";
@@ -12,28 +13,51 @@ import Header from "./Pages/Header.jsx";
 import Footer from "./Pages/Footer.jsx";
 import Overview from "./Pages/dashboard/Overview.jsx";
 import DashNav from "./components/dashNav.jsx";
-// Component to manage layout conditionally
-const Layout = () => {
-  const location = useLocation();
-  const hideHeaderFooter = location.pathname.startsWith("/Overview");
+import Health from "./Pages/dashboard/Health.jsx";
+
+// Dashboard layout
+const DashboardLayout = () => {
   const userData = {
     name: "Jake Vincent",
     greetingMessage: "Good Morning",
     greetingSubtext: "Hope you feel better today.",
-    avatarUrl: "https://placehold.co/32x32", // Optional: custom avatar
+    avatarUrl: "src/assets/media/Logo(Nav).png",
   };
+
+  return (
+    <div className="dashboard-container">
+      <DashNav userData={userData} />
+      <main className="dashboard-content">
+        <Outlet />
+      </main>
+    </div>
+  );
+};
+
+// Layout with conditional header/footer
+const Layout = () => {
+  const location = useLocation();
+  const hideHeaderFooter = ["/login", "/signup", "/dashboard"].some((path) =>
+    location.pathname.startsWith(path)
+  );
 
   return (
     <>
       {!hideHeaderFooter && <Header />}
-      <DashNav userData={userData} />
+
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/Overview" element={<Overview />} />
+
+        {/* Dashboard Routes */}
+        <Route path="/dashboard" element={<DashboardLayout />}>
+          <Route path="overview" element={<Overview />} />
+          <Route path="health" element={<Health />} />
+        </Route>
       </Routes>
-      <Footer />
+
+      {!hideHeaderFooter && <Footer />}
     </>
   );
 };
