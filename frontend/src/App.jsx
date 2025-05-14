@@ -14,7 +14,8 @@ import Footer from "./Pages/Footer.jsx";
 import Overview from "./Pages/dashboard/Overview.jsx";
 import DashNav from "./components/dashNav.jsx";
 import Health from "./Pages/dashboard/Health.jsx";
-
+import Shipments from "./Pages/dashboard/Shipments.jsx";
+import Settings from "./Pages/dashboard/Settings.jsx";
 // Dashboard layout
 const DashboardLayout = () => {
   const userData = {
@@ -52,12 +53,15 @@ const Layout = () => {
 
         {/* Dashboard Routes */}
         <Route path="/dashboard" element={<DashboardLayout />}>
+          <Route index element={<Overview />} />
           <Route path="overview" element={<Overview />} />
           <Route path="health" element={<Health />} />
+          <Route path="shipments" element={<Shipments />} />
+          <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>
 
-      {!hideHeaderFooter && <Footer />}
+      <Footer />
     </>
   );
 };

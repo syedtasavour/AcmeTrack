@@ -2,17 +2,26 @@ import React from "react";
 import Logo from "../assets/media/Logo(Nav).png";
 import EmailIcon from "../assets/media/Email Button.png";
 import NotificationIcon from "../assets/media/Notification Button.png";
-
+import { useNavigate } from "react-router-dom";
 function DashNav({ userData }) {
   const { name, greetingMessage, greetingSubtext, avatarUrl } = userData;
+  const navigate = useNavigate();
 
   return (
     <div className="w-full bg-white border-b border-neutral-200">
       <div className="px-6 py-4 flex flex-wrap md:flex-nowrap justify-between items-center gap-4">
         {/* Left Section: Logo & Title */}
         <div className="flex items-center gap-3">
-          <img className="w-12 h-12" src={Logo} alt="Logo" />
-          <div className="text-black text-2xl font-bold font-['DM_Sans']">
+          <img
+            className="w-12 h-12"
+            src={Logo}
+            alt="Logo"
+            onClick={() => navigate("/dashboard/overview")}
+          />
+          <div
+            className="text-black text-2xl font-bold font-['DM_Sans']"
+            onClick={() => navigate("/dashboard/overview")}
+          >
             AcmeTrack
           </div>
         </div>
@@ -38,11 +47,14 @@ function DashNav({ userData }) {
           <img className="w-12 h-12" src={EmailIcon} alt="Email" />
 
           {/* User Profile */}
-          <div className="px-2.5 py-2 rounded-[10px] outline outline-1 outline-neutral-200 flex items-center gap-1.5">
+          <div
+            className="px-2.5 py-2 rounded-[10px] outline outline-1 outline-neutral-200 flex items-center gap-1.5"
+            onClick={() => navigate("/dashboard/settings")}
+          >
             <div className="flex items-center gap-[5px]">
               <div className="w-8 h-8 bg-neutral-200 rounded-md overflow-hidden">
                 <img
-                  src={avatarUrl || "https://placehold.co/32x32"}
+                  src={avatarUrl}
                   alt="Avatar"
                   className="w-full h-full object-cover"
                 />

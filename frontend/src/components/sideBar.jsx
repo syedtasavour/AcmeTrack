@@ -22,11 +22,6 @@ const menuData = [
     section: "Support",
     items: [
       {
-        name: "Help Center",
-        icon: "❓",
-        path: "/dashboard/help-center",
-      },
-      {
         name: "Settings",
         icon: "⚙️",
         path: "/dashboard/settings",
