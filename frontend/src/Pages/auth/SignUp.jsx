@@ -1,95 +1,176 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import {
+  signupUser,
+  updateField,
+  toggleShowPassword,
+  selectSignupState,
+} from "../../redux/slices/signupSlice";
+
 function SignUp() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const {
+    firstName,
+    lastName,
+    email,
+    password,
+    agreeToTerms,
+    showPassword,
+    status,
+    error,
+  } = useSelector(selectSignupState);
+
+  // Redirect to dashboard on successful signup
+  useEffect(() => {
+    if (status === "succeeded") {
+      navigate("/dashboard");
+    }
+  }, [status, navigate]);
+
+  const handleChange = (e) => {
+    dispatch(updateField({ name: e.target.name, value: e.target.value }));
+  };
+
+  const handleCheckbox = (e) => {
+    dispatch(updateField({ name: e.target.name, value: e.target.checked }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const formData = {
+      firstName,
+      lastName,
+      email,
+      password,
+      agreeToTerms,
+    };
+
+    dispatch(signupUser(formData));
+  };
+
   return (
-    <div className="w-full max-w-md sm:max-w-lg lg:max-w-xl mx-auto h-auto relative bg-white overflow-hidden p-6 sm:p-8">
+    <form
+      onSubmit={handleSubmit}
+      className="w-full max-w-md sm:max-w-lg lg:max-w-xl mx-auto h-auto relative bg-white overflow-hidden p-6 sm:p-8"
+    >
       <div className="flex flex-col justify-start items-start gap-6 sm:gap-10">
-        {/* Title and Subheading */}
-        <div className="flex flex-col justify-center items-start gap-2 sm:gap-3">
-          <div className="text-zinc-800 text-3xl sm:text-4xl font-medium font-['Poppins']">
-            Sign up
-          </div>
-          <div className="text-stone-500/80 text-base font-normal font-['Poppins']">
-            Sign up for free to access any of our products
-          </div>
+        {/* Title */}
+        <div className="text-zinc-800 text-3xl sm:text-4xl font-medium">
+          Sign up
+        </div>
+        <div className="text-stone-500/80 text-base">
+          Sign up for free to access any of our products
         </div>
 
-        {/* Email Input */}
-        <div className="w-full sm:w-[473px] flex flex-col justify-start items-start gap-1">
-          <div className="self-stretch h-7 relative">
-            <div className="absolute text-stone-500 text-base font-normal font-['Poppins']">
-              Email address
-            </div>
-          </div>
-          <div className="self-stretch h-14 relative rounded-xl outline outline-1 outline-offset-[-1px] outline-stone-500/30" />
+        {/* First Name */}
+        <div className="w-full">
+          <label className="text-stone-500 text-base">First Name</label>
+          <input
+            type="text"
+            name="firstName"
+            value={firstName}
+            onChange={handleChange}
+            className="w-full h-14 mt-1 px-4 rounded-xl outline outline-1 outline-stone-500/30"
+            required
+          />
         </div>
 
-        {/* Password Input */}
-        <div className="w-full sm:w-[473px] flex flex-col justify-start items-start gap-1">
-          <div className="self-stretch h-7 relative">
-            <div className="absolute text-stone-500 text-base font-normal font-['Poppins']">
-              Password
-            </div>
-            <div className="w-6 h-6 absolute top-0 right-0 flex justify-center items-center bg-stone-500/80" />
-            <div className="absolute right-0 text-stone-500/80 text-lg font-normal font-['Poppins']">
-              Hide
-            </div>
-          </div>
-          <div className="self-stretch h-14 relative rounded-xl outline outline-1 outline-offset-[-1px] outline-stone-500/30" />
-          <div className="text-stone-500 text-sm font-normal font-['Poppins']">
+        {/* Last Name */}
+        <div className="w-full">
+          <label className="text-stone-500 text-base">Last Name</label>
+          <input
+            type="text"
+            name="lastName"
+            value={lastName}
+            onChange={handleChange}
+            className="w-full h-14 mt-1 px-4 rounded-xl outline outline-1 outline-stone-500/30"
+            required
+          />
+        </div>
+
+        {/* Email */}
+        <div className="w-full">
+          <label className="text-stone-500 text-base">Email Address</label>
+          <input
+            type="email"
+            name="email"
+            value={email}
+            onChange={handleChange}
+            className="w-full h-14 mt-1 px-4 rounded-xl outline outline-1 outline-stone-500/30"
+            required
+          />
+        </div>
+
+        {/* Password */}
+        <div className="w-full">
+          <label className="text-stone-500 text-base flex justify-between">
+            Password
+            <span
+              onClick={() => dispatch(toggleShowPassword())}
+              className="text-stone-500 cursor-pointer"
+            >
+              {showPassword ? "Hide" : "Show"}
+            </span>
+          </label>
+          <input
+            type={showPassword ? "text" : "password"}
+            name="password"
+            value={password}
+            onChange={handleChange}
+            className="w-full h-14 mt-1 px-4 rounded-xl outline outline-1 outline-stone-500/30"
+            required
+            minLength={6}
+          />
+          <p className="text-stone-500 text-sm mt-1">
             Use 8 or more characters with a mix of letters, numbers & symbols
-          </div>
+          </p>
         </div>
 
-        {/* Agreement Checkboxes */}
-        <div className="flex flex-col justify-start items-start gap-4">
-          <div className="flex justify-start items-center gap-2">
-            <div className="w-6 h-6 relative overflow-hidden">
-              <div className="w-4 h-4 left-[3px] top-[3px] absolute bg-neutral-900" />
-            </div>
-            <div className="text-zinc-800 text-base font-normal font-['Poppins']">
-              Agree to our
-              <span className="text-stone-500"> </span>
-              <span className="text-zinc-800 text-base font-normal font-['Poppins'] underline">
-                Terms of use
-              </span>
-              <span className="text-stone-500"> </span>
-              and
-              <span className="text-zinc-800 text-base font-normal font-['Poppins'] underline">
-                Privacy Policy
-              </span>
-            </div>
-          </div>
-          <div className="flex justify-start items-center gap-2">
-            <div className="w-6 h-6 relative overflow-hidden">
-              <div className="w-4 h-4 left-[3px] top-[3px] absolute bg-neutral-900" />
-            </div>
-            <div className="text-zinc-800 text-base font-normal font-['Poppins']">
-              Subscribe to our monthly newsletter
-            </div>
-          </div>
+        {/* Terms & Newsletter */}
+        <div className="flex flex-col gap-4">
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              name="agreeToTerms"
+              checked={agreeToTerms}
+              onChange={handleCheckbox}
+              required
+            />
+            Agree to our <span className="underline">Terms of Use</span> and{" "}
+            <span className="underline">Privacy Policy</span>
+          </label>
+
+          <label className="flex items-center gap-2">
+            <input type="checkbox" />
+            Subscribe to our monthly newsletter
+          </label>
         </div>
 
-        {/* Sign Up Button */}
-        <div className="w-64 sm:w-72 h-16 sm:h-18 relative bg-neutral-900 rounded-[32px] flex justify-center items-center">
-          <div className="text-center text-white text-xl font-medium font-['Poppins']">
-            Sign up
-          </div>
-        </div>
+        {/* Submit Button */}
+        <button
+          type="submit"
+          disabled={status === "loading"}
+          className="w-64 sm:w-72 h-16 bg-neutral-900 text-white rounded-[32px] text-xl"
+        >
+          {status === "loading" ? "Signing up..." : "Sign up"}
+        </button>
 
-        {/* Already have an account link */}
-        <div className="flex justify-start items-start gap-2">
-          <span className="text-zinc-800 text-base font-normal font-['Poppins']">
-            Already have an account?
-          </span>
-          <span className="text-stone-500 text-base font-normal font-['Poppins']">
-            {" "}
-          </span>
-          <span className="text-neutral-900 text-base font-normal font-['Poppins'] underline">
+        {/* Error Display */}
+        {error && <p className="text-red-500 mt-2">{error}</p>}
+
+        {/* Login Redirect */}
+        <div className="text-base text-zinc-800">
+          Already have an account?
+          <span className="underline text-neutral-900 ml-2 cursor-pointer">
             Log in
           </span>
         </div>
       </div>
-    </div>
+    </form>
   );
 }
 

@@ -1,11 +1,64 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import MoveRight from "../assets/media/MoveRight.svg"; // Adjust the path as necessary
-function NextShipment({ shipment }) {
+import axios from "axios";
+
+function NextShipment() {
+  const [shipment, setShipment] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchShipment = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}/shipments/recent`,
+          {
+            withCredentials: true,
+          }
+        );
+
+        if (response.data?.data) {
+          setShipment(response.data.data);
+        } else {
+          setError("No shipment found.");
+        }
+      } catch (err) {
+        setError("Failed to fetch shipment. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchShipment();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="w-[1067px] h-80 flex items-center justify-center bg-white/0 rounded-[10px] outline outline-1 outline-offset-[-1px] outline-zinc-400">
+        <p className="text-zinc-700 text-lg font-medium font-['Inter']">
+          Loading shipment...
+        </p>
+      </div>
+    );
+  }
+
+  if (error || !shipment) {
+    return (
+      <div className="w-[1067px] h-80 flex items-center justify-center bg-white/0 rounded-[10px] outline outline-1 outline-offset-[-1px] outline-zinc-400">
+        <p className="text-red-600 text-lg font-medium font-['Inter']">
+          {error}
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="w-[1067px] h-80 relative bg-white/0 rounded-[10px] outline outline-1 outline-offset-[-1px] outline-zinc-400">
         <div className="left-[25px] top-[26px] absolute justify-start text-zinc-900 text-2xl font-bold font-['Inter'] leading-loose">
-          Next Shipment
+          {shipment.status?.toLowerCase() === "delivered"
+            ? "Last Shipment"
+            : "Next Shipment"}
         </div>
         <div className="left-[25px] top-[82px] absolute justify-start text-zinc-900 text-sm font-medium font-['Inter'] leading-tight">
           Medication

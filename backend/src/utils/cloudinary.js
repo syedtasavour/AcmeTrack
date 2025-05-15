@@ -3,7 +3,7 @@ import { v2 as cloudinary } from "cloudinary";
 import { create } from "domain";
 import fs from "fs";
 import path from "path";
-
+import "dotenv/config";
 // Configure cloudinary with environment variables
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME, // Your Cloudinary cloud name
@@ -44,20 +44,19 @@ const destroyImageOnCloudinary = async (image) => {
     const response = await cloudinary.uploader.destroy(
       `acme-track/${updatedImage}`
     );
-    // console.log(response);
+
     return response;
   } catch (error) {
     return error;
   }
 };
 
-// const deleteAllImages  = async (req, res) => {
+// const deleteAllImages = async (req, res) => {
 //   cloudinary.api
-//     .delete_all_resources({type: 'upload'})
-//     .then(result=>console.log(result));
+//     .delete_all_resources({ type: "upload" })
+//     .then((result) => console.log(result));
 // };
-//
 
-// deleteAllImages()
+// deleteAllImages();
 
 export { uploadOnCloudinary, destroyImageOnCloudinary };

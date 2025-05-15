@@ -6,6 +6,7 @@ import {
   useLocation,
   Outlet,
 } from "react-router-dom";
+
 import LandingPage from "./Pages/landingPage/LandingPage";
 import SignUp from "./Pages/auth/SignUp.jsx";
 import Login from "./Pages/auth/Login.jsx";
@@ -16,6 +17,12 @@ import DashNav from "./components/dashNav.jsx";
 import Health from "./Pages/dashboard/Health.jsx";
 import Shipments from "./Pages/dashboard/Shipments.jsx";
 import Settings from "./Pages/dashboard/Settings.jsx";
+import Profile from "./Pages/dashboard/Profile.jsx";
+
+// Protectors
+import ProtectedRoute from "./routes/ProtectedRoute.jsx";
+import PublicRoute from "./routes/PublicRoute.jsx";
+
 // Dashboard layout
 const DashboardLayout = () => {
   const userData = {
@@ -48,20 +55,44 @@ const Layout = () => {
 
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/login" element={<Login />} />
 
-        {/* Dashboard Routes */}
-        <Route path="/dashboard" element={<DashboardLayout />}>
+        {/* Public Auth Routes */}
+        <Route
+          path="/signup"
+          element={
+            <PublicRoute>
+              <SignUp />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          }
+        />
+
+        {/* Protected Dashboard Routes */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<Overview />} />
           <Route path="overview" element={<Overview />} />
           <Route path="health" element={<Health />} />
           <Route path="shipments" element={<Shipments />} />
+          <Route path="profile" element={<Profile />} />
           <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>
 
-      <Footer />
+      {!hideHeaderFooter && <Footer />}
     </>
   );
 };

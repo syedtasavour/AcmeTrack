@@ -6,6 +6,7 @@ import {
   destroyImageOnCloudinary,
   uploadOnCloudinary,
 } from "../utils/cloudinary.js";
+import { HealthLog } from "../models/health.model.js";
 
 const generateAccessAndRefereshTokens = async (userId) => {
   try {
@@ -52,9 +53,30 @@ const createUser = asyncHandler(async (req, res) => {
   if (!createdUser) {
     throw new ApiError(500, null, "User not created");
   }
-  res
-    .status(201)
-    .json(new ApiResponse(201, createdUser, "User created successfully"));
+  const { refreshToken, accessToken } = await generateAccessAndRefereshTokens(
+    createdUser._id
+  );
+
+  const options = {
+    httpOnly: true,
+    secure: false,
+  };
+
+  return res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
+      new ApiResponse(
+        200,
+        {
+          user: createdUser,
+          accessToken,
+          refreshToken,
+        },
+        "User created successfully"
+      )
+    );
 });
 
 const loginUser = asyncHandler(async (req, res) => {
@@ -81,7 +103,7 @@ const loginUser = asyncHandler(async (req, res) => {
   );
   const options = {
     httpOnly: true,
-    secure: true,
+    secure: false,
   };
   return res
     .status(200)
@@ -160,7 +182,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
   const { firstName, lastName, username } = req.body;
 
   if (!firstName && !lastName && !username) {
-    throw new ApiError(400, "At least one field is required to update");
+    throw new ApiError(400, null, "At least one field is required to update");
   }
 
   const updateFields = {};
@@ -193,7 +215,7 @@ const updateProfilePicture = asyncHandler(async (req, res) => {
 
   // Ensure a profile image file is provided
   if (!profileImageLocalPath) {
-    throw new ApiError(400, "profile image file is missing");
+    throw new ApiError(400, null, "profile image file is missing");
   }
 
   // Upload the profile image to Cloudinary
@@ -203,6 +225,7 @@ const updateProfilePicture = asyncHandler(async (req, res) => {
   if (!profilePicture) {
     throw new ApiError(
       500,
+      null,
       "Failed to upload the profile image. Please try again later."
     );
   }
@@ -238,14 +261,154 @@ const deleteProfilePicture = asyncHandler(async (req, res) => {
 
   if (oldLink !== "") {
     await destroyImageOnCloudinary(oldLink);
+  } else {
+    throw new ApiError(404, null, "No profile picture found");
   }
-  // user.profilePicture = "";
+  user.profilePicture = "";
   await user.save({ validateBeforeSave: false });
   return res
     .status(200)
     .json(new ApiResponse(200, {}, "Profile picture deleted successfully"));
 });
 
+const fetchStrikes = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { strikes: user.strikes },
+        "Strikes fetched successfully"
+      )
+    );
+});
+
+const addUserDetails = asyncHandler(async (req, res) => {
+  const GENDERS = ["male", "female", "other"];
+  const BLOOD_TYPES = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+  const { gender, dateOfBirth, bloodType } = req.body;
+
+  if (gender && !GENDERS.includes(gender)) {
+    throw new ApiError(400, null, "Invalid gender value");
+  }
+  if (bloodType && !BLOOD_TYPES.includes(bloodType)) {
+    throw new ApiError(400, null, "Invalid blood type value");
+  }
+
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    throw new ApiError(404, null, "User not found");
+  }
+
+  const updateUser = await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: {
+        ...(gender && { gender }),
+        ...(dateOfBirth && { dateOfBirth }),
+        ...(bloodType && { bloodType }),
+      },
+    },
+    { new: true }
+  );
+
+  if (!updateUser) {
+    throw new ApiError(404, null, "Failed to update user");
+  }
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "User details updated successfully"));
+});
+const fetchUserDash = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id).select(
+    "gender dateOfBirth bloodType profilePicture firstName lastName"
+  );
+  if (!user) {
+    throw new ApiError(404, null, "User not found");
+  }
+
+  // Calculate age in years, months, and days
+  let ageString = "NA";
+  let dobYearMonth = "NA";
+  if (user.dateOfBirth) {
+    const dob = new Date(user.dateOfBirth);
+    const now = new Date();
+
+    let years = now.getFullYear() - dob.getFullYear();
+    let months = now.getMonth() - dob.getMonth();
+    let days = now.getDate() - dob.getDate();
+
+    if (days < 0) {
+      months--;
+      // Get days in previous month
+      const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+      days += prevMonth.getDate();
+    }
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
+
+    // Build age string with priority: years > months > days
+    if (years > 0) {
+      ageString = `${years} year${years > 1 ? "s" : ""} `;
+    } else if (months > 0) {
+      ageString = `${months} month${months > 1 ? "s" : ""} `;
+    } else if (days > 0) {
+      ageString = `${days} day${days > 1 ? "s" : ""}`;
+    } else {
+      ageString = "0 days old";
+    }
+
+    // Return dob in year and month (YYYY-MM)
+    const year = dob.getFullYear();
+    const month = String(dob.getMonth() + 1).padStart(2, "0");
+    dobYearMonth = `${year}-${month}`;
+  }
+
+  const recenthealth =
+    (await HealthLog.findOne({ userId: req.user._id }).sort({
+      createdAt: -1,
+    })) || {};
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        gender: user.gender || "NA",
+        bloodType: user.bloodType || "NA",
+        height:
+          recenthealth && recenthealth.height ? recenthealth.height : "NA",
+        age: ageString,
+        profilePicture: user.profilePicture,
+        name: user.lastName
+          ? user.firstName + " " + user.lastName
+          : user.firstName,
+      },
+      "User details fetched successfully"
+    )
+  );
+});
+
+const changeEmail = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    throw new ApiError(400, null, "Email is required");
+  }
+  const user = await User.findById({ email: email });
+  if (user) {
+    throw new ApiError(404, null, "user already exists with this email");
+  }
+  user.email = email;
+  await user.save({ validateBeforeSave: false });
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Email updated successfully"));
+});
 export {
   createUser,
   loginUser,
@@ -255,4 +418,8 @@ export {
   updateAccountDetails,
   updateProfilePicture,
   deleteProfilePicture,
+  fetchStrikes,
+  addUserDetails,
+  fetchUserDash,
+  changeEmail,
 };

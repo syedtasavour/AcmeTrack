@@ -7,6 +7,18 @@ export default function OverviewBigCard({
   description = "Description",
   icon = null,
 }) {
+  const isNumeric = !isNaN(parseFloat(value)) && isFinite(value);
+
+  // Determine left position for 'type'
+  let typeLeft;
+  if (type === "Kg") {
+    typeLeft = "166px";
+  } else if (isNumeric) {
+    typeLeft = "110px";
+  } else {
+    typeLeft = "140px";
+  }
+
   return (
     <div>
       <div className="w-96 h-44 relative bg-white/0 rounded-[10px] outline outline-1 outline-offset-[-1px] outline-zinc-400">
@@ -20,7 +32,10 @@ export default function OverviewBigCard({
         <div className="left-[65px] top-[43px] absolute justify-start text-zinc-900 text-4xl font-bold font-['Inter'] leading-10">
           {value}
         </div>
-        <div className="left-[130px] top-[59px] absolute justify-start text-zinc-900 text-xl font-normal font-['Inter'] leading-7">
+        <div
+          style={{ left: typeLeft }}
+          className="top-[59px] absolute justify-start text-zinc-900 text-xl font-normal font-['Inter'] leading-7"
+        >
           {type}
         </div>
         <div className="left-[25px] top-[101px] absolute justify-start text-zinc-900 text-xs font-normal font-['Inter'] leading-none">

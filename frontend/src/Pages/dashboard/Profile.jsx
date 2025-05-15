@@ -1,8 +1,6 @@
-import SideBar from "../../components/sideBar";
-import NextShipment from "../../components/NextShipment";
-import ShipmentHistory from "../../components/ShipmentHistory";
-
-function Shipments() {
+import PersonalDetails from "../../components/PersonalDetails.jsx";
+import SideBar from "../../components/SideBar.jsx";
+function Profile() {
   return (
     <div className="flex min-h-screen bg-white">
       {/* Sidebar */}
@@ -13,15 +11,12 @@ function Shipments() {
       <div className="flex-1 p-8">
         {/* First Row: NextShipment */}
         <div className="mb-8">
-          <NextShipment />
+          <PersonalDetails />
         </div>
         {/* Second Row: ShipmentHistory */}
-        <div>
-          <ShipmentHistory />
-        </div>
       </div>
     </div>
   );
 }
 
-export default Shipments;
+export default Profile;

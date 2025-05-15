@@ -14,7 +14,7 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
 
     // 4. If no token, throw error
     if (!token) {
-      throw new ApiError(401, "Unauthorized request");
+      throw new ApiError(401, null, "Unauthorized request");
     }
 
     // 5. Verify token using secret key
@@ -27,7 +27,7 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
 
     // 7. If user not found, throw error
     if (!user) {
-      throw new ApiError(401, "Invalid Access Token");
+      throw new ApiError(401, null, "Invalid Access Token");
     }
 
     // 8. Attach user to request object
@@ -37,6 +37,6 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
     next();
   } catch (error) {
     // 10. Handle invalid or expired token
-    throw new ApiError(401, error?.message || "Invalid access token");
+    throw new ApiError(401, null, error?.message || "Invalid access token");
   }
 });

@@ -14,19 +14,23 @@ const addHealthLog = asyncHandler(async (req, res) => {
   } = req.body;
 
   // Validate required fields
-  if (
-    !dailyWeight ||
-    !height ||
-    !heartRate ||
-    !bloodPressure ||
-    !medications ||
-    !Array.isArray(medications)
-  ) {
-    throw new ApiError(
-      400,
-      null,
-      "All required fields must be provided and medications must be an array"
-    );
+  if (dailyWeight === undefined) {
+    throw new ApiError(400, null, "Missing required field: dailyWeight");
+  }
+  if (height === undefined) {
+    throw new ApiError(400, null, "Missing required field: height");
+  }
+  if (heartRate === undefined) {
+    throw new ApiError(400, null, "Missing required field: heartRate");
+  }
+  if (bloodPressure === undefined) {
+    throw new ApiError(400, null, "Missing required field: bloodPressure");
+  }
+  if (medications === undefined) {
+    throw new ApiError(400, null, "Missing required field: medications");
+  }
+  if (!Array.isArray(medications)) {
+    throw new ApiError(400, null, "Medications must be an array");
   }
 
   // Validate each medication entry
@@ -89,18 +93,37 @@ const addHealthLog = asyncHandler(async (req, res) => {
 const getRecentHealthLogs = asyncHandler(async (req, res) => {
   const { limit = 2 } = req.query;
 
-  // Fetch recent health log entries, sorted by creation date
-  const healthLogs = await HealthLog.find({ userId: req.user._id })
+  // Get today's date at midnight
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // Fetch recent health logs excluding today, sorted by creation date
+  const healthLogs = await HealthLog.find({
+    userId: req.user._id,
+    createdAt: { $lt: today },
+  })
     .sort({ createdAt: -1 })
     .limit(parseInt(limit));
+
+  // Map to required fields: heartRate, bloodPressure, symptomsMood, date (human-readable)
+  const formattedLogs = healthLogs.map((log) => ({
+    heartRate: log.heartRate,
+    bloodPressure: log.bloodPressure,
+    symptomsMood: log.symptomsMood,
+    date: log.createdAt.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    }),
+  }));
 
   res
     .status(200)
     .json(
       new ApiResponse(
         200,
-        healthLogs,
-        "Recent health logs fetched successfully"
+        formattedLogs,
+        "Recent health logs (excluding today) fetched successfully"
       )
     );
 });
@@ -109,14 +132,14 @@ const getTodaysSummary = asyncHandler(async (req, res) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  // Fetch today's health log entries
-  const todaysLogs = await HealthLog.find({
+  // Fetch the most recent health log entry for today
+  const todaysLog = await HealthLog.findOne({
     userId: req.user._id,
     createdAt: { $gte: today },
-  });
+  }).sort({ createdAt: -1 });
 
-  if (!todaysLogs.length) {
-    throw new ApiError(404, null, "No health logs found for today");
+  if (!todaysLog) {
+    throw new ApiError(404, null, "No health log found for today");
   }
 
   res
@@ -124,8 +147,8 @@ const getTodaysSummary = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(
         200,
-        todaysLogs,
-        "Today's health logs fetched successfully"
+        todaysLog,
+        "Most recent health log for today fetched successfully"
       )
     );
 });
@@ -150,11 +173,20 @@ const getHealthStatus = asyncHandler(async (req, res) => {
   const weightStatus = Math.min((avgWeight / 100) * 100, 100).toFixed(2);
   const bmiStatus = Math.min((avgWeight / 120) * 100, 100).toFixed(2); // Example BMI calculation
 
-  const healthStatus = {
-    heartRate: `${heartRateStatus}%`,
-    weight: `${weightStatus}%`,
-    bmi: `${bmiStatus}%`,
-  };
+  const healthStatus = [
+    {
+      label: "Heart Rate",
+      percentage: heartRateStatus,
+    },
+    {
+      label: "Weight",
+      percentage: weightStatus,
+    },
+    {
+      label: "BMI",
+      percentage: bmiStatus,
+    },
+  ];
 
   res
     .status(200)
@@ -262,14 +294,65 @@ const getWeeklyWeightChange = asyncHandler(async (req, res) => {
     );
 });
 
+const monthNames = [
+  "JAN",
+  "FEB",
+  "MAR",
+  "APR",
+  "MAY",
+  "JUN",
+  "JUL",
+  "AUG",
+  "SEP",
+  "OCT",
+  "NOV",
+  "DEC",
+];
+
 const getBloodPressureRecords = asyncHandler(async (req, res) => {
-  // Fetch all health logs for the user
+  const userId = req.user._id;
 
-  const healthLogs = await HealthLog.find({ userId: req.user._id }).select(
-    "bloodPressure createdAt"
-  );
+  // Aggregate pipeline
+  const results = await HealthLog.aggregate([
+    { $match: { userId: userId } },
 
-  if (!healthLogs.length) {
+    // Extract month from createdAt
+    {
+      $addFields: {
+        month: { $month: "$createdAt" },
+      },
+    },
+
+    // Parse systolic from bloodPressure string "120/80"
+    {
+      $addFields: {
+        systolic: {
+          $toInt: {
+            $arrayElemAt: [{ $split: ["$bloodPressure", "/"] }, 0],
+          },
+        },
+      },
+    },
+
+    // Group by month and get max systolic
+    {
+      $group: {
+        _id: "$month",
+        maxSystolic: { $max: "$systolic" },
+      },
+    },
+
+    // Sort by month ascending
+    { $sort: { _id: 1 } },
+  ]);
+
+  // Format results to desired output
+  const formattedResult = results.map(({ _id, maxSystolic }) => ({
+    name: monthNames[_id - 1],
+    value: maxSystolic,
+  }));
+
+  if (!formattedResult.length) {
     throw new ApiError(
       404,
       null,
@@ -277,26 +360,34 @@ const getBloodPressureRecords = asyncHandler(async (req, res) => {
     );
   }
 
-  // Map records to include only date, month, and blood pressure
-  const bloodPressureRecords = healthLogs.map((log) => {
-    const date = log.createdAt.toISOString().split("T")[0]; // Extract date in YYYY-MM-DD format
-    return {
-      date,
-      bloodPressure: log.bloodPressure,
-    };
-  });
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        formattedResult,
+        "Highest systolic blood pressure per month fetched successfully"
+      )
+    );
+});
+
+const currWeight = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+
+  const results = await HealthLog.findOne({ userId: userId })
+    .sort({ createdAt: -1 })
+    .select("dailyWeight");
 
   res
     .status(200)
     .json(
       new ApiResponse(
         200,
-        bloodPressureRecords,
-        "Blood pressure records fetched successfully"
+        { dailyWeight: results.dailyWeight },
+        "Highest systolic blood pressure per month fetched successfully"
       )
     );
 });
-
 export {
   addHealthLog,
   getRecentHealthLogs,
@@ -306,4 +397,5 @@ export {
   calculateBMI,
   getWeeklyWeightChange,
   getBloodPressureRecords,
+  currWeight,
 };

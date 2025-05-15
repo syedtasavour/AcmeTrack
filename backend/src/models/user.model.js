@@ -1,6 +1,9 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+const GENDERS = ["male", "female", "other"];
+const BLOOD_TYPES = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+
 const userSchema = new mongoose.Schema(
   {
     firstName: {
@@ -35,6 +38,17 @@ const userSchema = new mongoose.Schema(
     strikes: {
       type: Number,
       default: 0,
+    },
+    gender: {
+      type: String,
+      enum: GENDERS,
+    },
+    dateOfBirth: {
+      type: Date,
+    },
+    bloodType: {
+      type: String,
+      enum: BLOOD_TYPES,
     },
   },
   { timestamps: true }

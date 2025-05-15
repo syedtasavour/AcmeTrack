@@ -1,6 +1,29 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
-function HealthStatus({ data }) {
+function HealthStatus() {
+  const [data, setData] = useState([]);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchHealthData = async () => {
+      setError(null);
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}/health/health-status`,
+          {
+            withCredentials: true, // This allows sending cookies with the request
+          }
+        );
+        setData(response.data.data);
+      } catch (err) {
+        setError(err.message || "Failed to fetch health data");
+      }
+    };
+
+    fetchHealthData();
+  }, []);
+
   return (
     <div className="p-4 bg-zinc-50 rounded-lg shadow-sm max-w-xs w-full">
       <div className="text-zinc-900 text-lg font-semibold font-['Plus_Jakarta_Sans'] mb-4">

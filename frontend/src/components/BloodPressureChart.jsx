@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import {
   LineChart,
   Line,
@@ -7,16 +8,8 @@ import {
   Tooltip,
   ResponsiveContainer,
   CartesianGrid,
+  ReferenceLine,
 } from "recharts";
-
-const data = [
-  { name: "JAN", value: 3.2 },
-  { name: "FEB", value: 4 },
-  { name: "MAR", value: 2.5 },
-  { name: "APR", value: 3.5 },
-  { name: "MAY", value: 3 },
-  { name: "JUN", value: 2.8 },
-];
 
 const CustomTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
@@ -31,21 +24,64 @@ const CustomTooltip = ({ active, payload }) => {
 };
 
 const BloodPressureChart = () => {
+  const [data, setData] = useState([]);
+  const [status, setStatus] = useState("idle");
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchHealthData = async () => {
+      setStatus("loading");
+      setError(null);
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}/health/blood-pressure`,
+          {
+            withCredentials: true,
+          }
+        );
+        setData(response.data.data);
+        setStatus("succeeded");
+      } catch (err) {
+        setError(err.message || "Failed to fetch health data");
+        setStatus("failed");
+      }
+    };
+
+    fetchHealthData();
+  }, []);
+
   return (
     <div className="bg-white shadow-md rounded-lg p-4 w-full">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold text-gray-800">Blood Pressure</h2>
-        <select className="border text-sm text-gray-700 px-2 py-1 rounded-md">
-          <option>Month</option>
-        </select>
       </div>
 
       <ResponsiveContainer width="100%" height={200}>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
-          <YAxis domain={[1, 4]} />
+          <YAxis domain={[60, 180]} />
           <Tooltip content={<CustomTooltip />} />
+
+          <ReferenceLine
+            y={80}
+            label="Low (80)"
+            stroke="blue"
+            strokeDasharray="3 3"
+          />
+          <ReferenceLine
+            y={120}
+            label="Medium (120)"
+            stroke="orange"
+            strokeDasharray="3 3"
+          />
+          <ReferenceLine
+            y={160}
+            label="High (160)"
+            stroke="red"
+            strokeDasharray="3 3"
+          />
+
           <Line
             type="monotone"
             dataKey="value"

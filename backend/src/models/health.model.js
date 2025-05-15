@@ -13,8 +13,9 @@ const healthSchema = new mongoose.Schema(
     height: { type: Number, required: true }, // in inches
     medications: [
       {
-        type: { type: String, required: true },
+        type: { type: String, required: true }, // e.g., "Aspirin"
         dosage: { type: String, required: true },
+        time: { type: String }, // e.g., "8:00 AM"
       },
     ], // array of medications
     symptomsMood: { type: String }, // optional field for symptoms/mood

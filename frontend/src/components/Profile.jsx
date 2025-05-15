@@ -1,49 +1,96 @@
 import React, { useState } from "react";
+import axios from "axios";
 import emailIcon from "../assets/media/Mail.svg";
-import passwordIcon from "../assets/media/password.svg"; // Adjust path and filename as needed
+import passwordIcon from "../assets/media/password.svg";
 
 function Profile({ user }) {
-  // State for form inputs
   const [formData, setFormData] = useState({
     firstName: user?.firstName || "",
     lastName: user?.lastName || "",
-    userName: user?.userName || "",
+    username: user?.username || "",
     email: user?.email || "",
     currentPassword: "",
     newPassword: "",
     confirmNewPassword: "",
+    photoPreview: "", // for instant preview
   });
 
-  // Handle input changes
+  const [photoFile, setPhotoFile] = useState(null);
+
+  const configJSON = {
+    withCredentials: true,
+    headers: { "Content-Type": "application/json" },
+  };
+
+  const configFormData = {
+    withCredentials: true,
+    headers: { "Content-Type": "multipart/form-data" },
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle form submission
-  const handleSaveChanges = () => {
-    if (formData.newPassword !== formData.confirmNewPassword) {
-      alert("New password and confirm password do not match!");
-      return;
+  const handleSaveChanges = async () => {
+    // Validate password fields only if the user wants to change password
+    if (
+      formData.newPassword ||
+      formData.confirmNewPassword ||
+      formData.currentPassword
+    ) {
+      if (!formData.currentPassword) {
+        alert("Please enter your current password to change your password.");
+        return;
+      }
+      if (formData.newPassword !== formData.confirmNewPassword) {
+        alert("New password and confirm password do not match!");
+        return;
+      }
     }
-    console.log("Saving changes:", formData);
-    // Example: Send formData to an API
+
+    try {
+      // Prepare only fields that have values and differ from initial user data for update
+      const profileUpdates = {};
+
+      if (formData.firstName && formData.firstName !== user?.firstName)
+        profileUpdates.firstName = formData.firstName;
+      if (formData.lastName && formData.lastName !== user?.lastName)
+        profileUpdates.lastName = formData.lastName;
+      if (formData.username && formData.username !== user?.username)
+        profileUpdates.username = formData.username;
+      if (formData.email && formData.email !== user?.email)
+        profileUpdates.email = formData.email;
+
+      // Only send update if at least one field changed
+      if (Object.keys(profileUpdates).length > 0) {
+        await axios.patch(
+          `${import.meta.env.VITE_API_BASE_URL}/users/update-profile-details`,
+          profileUpdates,
+          configJSON
+        );
+      }
+
+      // Update password if fields are filled (user wants to change password)
+      if (formData.currentPassword && formData.newPassword) {
+        await axios.patch(
+          `${import.meta.env.VITE_API_BASE_URL}/users/password`,
+          {
+            currentPassword: formData.currentPassword,
+            newPassword: formData.newPassword,
+            confirmNewPassword: formData.confirmNewPassword,
+          },
+          configJSON
+        );
+      }
+
+      alert("Profile updated successfully.");
+    } catch (error) {
+      console.error(error);
+      alert("An error occurred while updating the profile.");
+    }
   };
 
-  // Handle cancel (reset form to initial values)
-  const handleCancel = () => {
-    setFormData({
-      firstName: user?.firstName || "",
-      lastName: user?.lastName || "",
-      userName: user?.userName || "",
-      email: user?.email || "",
-      currentPassword: "",
-      newPassword: "",
-      confirmNewPassword: "",
-    });
-  };
-
-  // Handle password reset (clear password fields)
   const handleResetPassword = () => {
     setFormData((prev) => ({
       ...prev,
@@ -53,19 +100,53 @@ function Profile({ user }) {
     }));
   };
 
-  // Handle photo upload
-  const handlePhotoUpload = (e) => {
+  const handlePhotoUpload = async (e) => {
     const file = e.target.files[0];
-    if (file) {
-      console.log("Uploading photo:", file.name);
-      // Example: Upload file to server or update state
+    if (!file) return;
+
+    setPhotoFile(file);
+
+    // Show preview instantly
+    const previewUrl = URL.createObjectURL(file);
+    setFormData((prev) => ({
+      ...prev,
+      photoPreview: previewUrl,
+    }));
+
+    try {
+      const data = new FormData();
+      data.append("profileImage", file);
+
+      await axios.patch(
+        `${import.meta.env.VITE_API_BASE_URL}/users/update-profile-picture`,
+        data,
+        configFormData
+      );
+
+      alert("Photo uploaded successfully.");
+    } catch (error) {
+      console.error("Photo upload error:", error);
+      alert("Failed to upload photo.");
     }
   };
 
-  // Handle photo deletion
-  const handlePhotoDelete = () => {
-    console.log("Deleting profile photo");
-    // Example: Update state or API to remove photo
+  const handlePhotoDelete = async () => {
+    try {
+      const res = await axios.patch(
+        `${import.meta.env.VITE_API_BASE_URL}/users/delete-profile-picture`,
+        null,
+        configFormData
+      ); // Adjust if there's a delete API
+      alert(res.data.message);
+      setPhotoFile(null);
+      setFormData((prev) => ({ ...prev, photoPreview: "" }));
+      alert("Profile photo deleted.");
+    } catch (error) {
+      console.error(error);
+      const message =
+        error.response?.data.match(/<pre>(.*?)<br>/s)?.[1] || "Signup failed";
+      alert(message);
+    }
   };
 
   return (
@@ -74,7 +155,11 @@ function Profile({ user }) {
       <div className="relative">
         <img
           className="w-32 h-32 rounded-full"
-          src={user?.photoUrl || "https://placehold.co/125x125"}
+          src={
+            formData.photoPreview ||
+            user?.photoUrl ||
+            "https://placehold.co/125x125"
+          }
           alt="Profile"
         />
         <div className="mt-4 flex gap-4">
@@ -139,8 +224,8 @@ function Profile({ user }) {
           </label>
           <input
             type="text"
-            name="userName"
-            value={formData.userName}
+            name="username"
+            value={formData.username}
             onChange={handleInputChange}
             placeholder="eg. alaa.mohamed"
             className="w-full mt-2 h-12 bg-white rounded-lg border border-gray-300 px-4 text-base font-normal font-['Montserrat'] text-gray-400"
@@ -175,6 +260,9 @@ function Profile({ user }) {
       <hr className="border-stone-300" />
 
       {/* Password Section */}
+      <div className="mb-2 text-sm italic text-gray-500">
+        * Note: Fill password fields only if you want to change your password.
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="text-slate-600 text-base font-bold font-['Montserrat']">
@@ -245,14 +333,7 @@ function Profile({ user }) {
             Save Changes
           </span>
         </button>
-        <button
-          className="w-48 h-12 px-5 py-2.5 bg-white rounded-lg outline outline-1 outline-slate-600 flex justify-center items-center"
-          onClick={handleCancel}
-        >
-          <span className="text-slate-600 text-sm font-bold font-['Montserrat'] leading-tight">
-            Cancel
-          </span>
-        </button>
+
         <button
           className="w-48 h-12 px-5 py-2.5 bg-white rounded-lg outline outline-1 outline-slate-600 flex justify-center items-center"
           onClick={handleResetPassword}

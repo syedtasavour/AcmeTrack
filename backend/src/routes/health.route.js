@@ -11,6 +11,7 @@ import {
   calculateBMI,
   getWeeklyWeightChange,
   getBloodPressureRecords,
+  currWeight,
 } from "../controllers/health.controller.js";
 
 router.route("/add-health-log").post(verifyJWT, addHealthLog);
@@ -21,5 +22,6 @@ router.route("/total-weight-loss").get(verifyJWT, getTotalWeightLoss);
 router.route("/calculate-bmi").get(verifyJWT, calculateBMI);
 router.route("/weekly-weight").get(verifyJWT, getWeeklyWeightChange);
 router.route("/blood-pressure").get(verifyJWT, getBloodPressureRecords);
+router.route("/curr-weight").get(verifyJWT, currWeight);
 
 export default router;

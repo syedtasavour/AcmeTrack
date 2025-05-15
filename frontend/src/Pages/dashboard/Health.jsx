@@ -4,27 +4,6 @@ import RecentEntries from "../../components/RecentEntries";
 import TodaySummary from "../../components/TodaySummary";
 
 function Health() {
-  const summaryData = {
-    weight: "185 lbs",
-    medications: 4,
-    check: "Entered",
-  };
-
-  const sampleEntries = [
-    {
-      date: "Oct 25, 2023",
-      weight: 184.9,
-      meds: 4,
-      note: "Felt better after rest...",
-    },
-    {
-      date: "Oct 24, 2023",
-      weight: 185.1,
-      meds: 3,
-      note: "Slight headache in the evening...",
-    },
-  ];
-
   return (
     <div className="flex min-h-screen bg-white">
       {/* Sidebar */}
@@ -38,8 +17,8 @@ function Health() {
         </div>
         {/* Second row: RecentEntries and TodaySummary */}
         <div className="flex gap-6 mt-6">
-          <RecentEntries entries={sampleEntries} />
-          <TodaySummary summary={summaryData} />
+          <RecentEntries />
+          <TodaySummary />
         </div>
       </div>
     </div>
