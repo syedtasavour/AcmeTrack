@@ -43,7 +43,12 @@ function DashNav({ userData }) {
         );
         setUser(data.data);
       } catch (err) {
-        console.error("Error fetching user data:", err);
+        console.error("Error fetching user data:", err.status);
+        if (err.status === 401) {
+          localStorage.setItem("loggedIn", "false");
+          setError("Session expired. Please log in again.");
+          navigate("/login");
+        }
         setError("Unable to load user data");
         setUser(null);
       }
