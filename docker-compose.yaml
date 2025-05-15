@@ -1,0 +1,47 @@
+version: "3"
+services:
+  front:
+    build:
+      context: "./frontend"
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    container_name: react-front-container
+    environment:
+      - WATCHPACK_POLLING=true
+    networks:
+      - mern-network
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: "./backend"
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3002"
+    container_name: backend-container
+    networks:
+      - mern-network
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo-container
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongoData:/data/db
+    networks:
+      - mern-network
+
+networks:
+  mern-network:
+
+volumes:
+  mongoData:
