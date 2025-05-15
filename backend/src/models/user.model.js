@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 const GENDERS = ["male", "female", "other"];
 const BLOOD_TYPES = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
-
+import "dotenv/config";
 const userSchema = new mongoose.Schema(
   {
     firstName: {
@@ -72,9 +72,9 @@ userSchema.methods.generateAccessToken = function () {
       username: this.username,
       fullName: this.fullName,
     },
-    process.env.ACESS_TOKEN_SECRET,
+    process.env.ACCESS_TOKEN_SECRET,
     {
-      expiresIn: process.env.ACESS_TOKEN_EXPIRY,
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
     }
   );
 };

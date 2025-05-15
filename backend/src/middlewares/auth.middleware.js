@@ -18,7 +18,7 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
     }
 
     // 5. Verify token using secret key
-    const decodedToken = jwt.verify(token, process.env.ACESS_TOKEN_SECRET);
+    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
     // 6. Find related user excluding sensitive fields
     const user = await User.findById(decodedToken?._id).select(
