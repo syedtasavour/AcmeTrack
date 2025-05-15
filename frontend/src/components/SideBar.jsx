@@ -1,5 +1,5 @@
-import React from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import React, { use } from "react";
+import { useNavigate } from "react-router-dom";
 
 const menuData = [
   {
@@ -26,13 +26,17 @@ const menuData = [
         icon: "⚙️",
         path: "/dashboard/settings",
       },
+      {
+        name: "Logout",
+        icon: "↩️",
+        path: "/dashboard/logout",
+      },
     ],
   },
 ];
 
 function SideBar() {
   const navigate = useNavigate();
-  const location = useLocation(); // Get the current URL path
 
   return (
     <div className="h-full w-64 bg-zinc-100 border-r border-neutral-200 flex flex-col items-center">

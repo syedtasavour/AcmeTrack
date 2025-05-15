@@ -1,5 +1,5 @@
-import SideBar from "../../components/sideBar";
-import Profile from "../../components/profile";
+import SideBar from "../../components/SideBar";
+import Profile from "../../components/Profile";
 function Settings() {
   return (
     <div className="flex min-h-screen bg-white">

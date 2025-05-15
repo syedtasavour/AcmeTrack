@@ -1,4 +1,4 @@
-import SideBar from "../../components/sideBar";
+import SideBar from "../../components/SideBar";
 import AddHealthLog from "../../components/AddHealthLog";
 import RecentEntries from "../../components/RecentEntries";
 import TodaySummary from "../../components/TodaySummary";

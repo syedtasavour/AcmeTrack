@@ -18,6 +18,7 @@ import Health from "./Pages/dashboard/Health.jsx";
 import Shipments from "./Pages/dashboard/Shipments.jsx";
 import Settings from "./Pages/dashboard/Settings.jsx";
 import Profile from "./Pages/dashboard/Profile.jsx";
+import Logout from "./Pages/auth/Logout.jsx";
 
 // Protectors
 import ProtectedRoute from "./routes/ProtectedRoute.jsx";
@@ -89,6 +90,7 @@ const Layout = () => {
           <Route path="shipments" element={<Shipments />} />
           <Route path="profile" element={<Profile />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="logout" element={<Logout />} />
         </Route>
       </Routes>
 

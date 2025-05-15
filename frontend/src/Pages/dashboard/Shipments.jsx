@@ -1,4 +1,4 @@
-import SideBar from "../../components/sideBar";
+import SideBar from "../../components/SideBar";
 import NextShipment from "../../components/NextShipment";
 import ShipmentHistory from "../../components/ShipmentHistory";
 

@@ -5,9 +5,8 @@ import tailwindcss from "@tailwindcss/vite";
 // https://vite.dev/config/
 export default defineConfig({
   server: {
-    proxy: {
-      "/api": "http://localhost:3000",
-    },
+    host: "0.0.0.0", // 👈 exposes to Docker and host machine
+    port: 5173,
   },
 
   plugins: [tailwindcss(), react()],
