@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import SideBar from "../../components/sideBar";
+import SideBar from "../../components/SideBar";
 import UserDash from "../../components/userDash";
 import Avatar from "../../assets/media/card.png";
 import HealthStatus from "../../components/healthStatus";
@@ -98,7 +98,7 @@ function Overview() {
       } catch (err) {
         setErrors((prev) => ({
           ...prev,
-          dailyWeight: "Daily weight data unavailable.",
+          dailyWeight: "--",
         }));
       }
     };
@@ -124,6 +124,11 @@ function Overview() {
     };
     fetchShipment();
   }, []);
+  const description = dailyWeight
+    ? dailyWeight > 70
+      ? "Warning: Weight above recommended level"
+      : "Weight within healthy range"
+    : "Weight data unavailable";
 
   return (
     <div className="flex min-h-screen bg-white">
@@ -170,7 +175,7 @@ function Overview() {
             label="Current Weight"
             value={dailyWeight ?? errors.dailyWeight ?? "—"}
             type="Kg"
-            description="Down 5 lbs from last week"
+            description={description}
             icon={scale}
           />
           <OverviewBigCard

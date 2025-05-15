@@ -45,7 +45,8 @@ function DashNav({ userData }) {
       } catch (err) {
         console.error("Error fetching user data:", err.status);
         if (err.status === 401) {
-          localStorage.setItem("loggedIn", "false");
+          localStorage.removeItem("loggedIn");
+
           setError("Session expired. Please log in again.");
           navigate("/login");
         }

@@ -12,6 +12,9 @@ export default function OverviewBigCard({
   // Determine left position for 'type'
   let typeLeft;
   if (type === "Kg") {
+    if (value != Number(value)) {
+      type = "";
+    }
     typeLeft = "166px";
   } else if (isNumeric) {
     typeLeft = "110px";

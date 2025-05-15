@@ -1,5 +1,5 @@
-import PersonalDetails from "../../components/PersonalDetails.jsx";
-import SideBar from "../../components/SideBar.jsx";
+import PersonalDetails from "../../components/PersonalDetails";
+import SideBar from "../../components/SideBar";
 function Profile() {
   return (
     <div className="flex min-h-screen bg-white">
