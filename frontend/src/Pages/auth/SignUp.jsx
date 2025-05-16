@@ -126,7 +126,7 @@ function SignUp() {
             minLength={6}
           />
           <p className="text-stone-500 text-sm mt-1">
-            Use 8 or more characters with a mix of letters, numbers & symbols
+            Use 6 or more characters with a mix of letters, numbers & symbols
           </p>
         </div>
 
