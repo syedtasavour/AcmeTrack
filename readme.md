@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- **Node.js**: Version 16 or higher (v22 recommended, as per Dockerfile)
+- **Node.js**: Version 20 or higher (v22 recommended, as per Dockerfile)
 - **MongoDB**: Required for local development without Docker (running on `localhost:27017`)
 - **Docker & Docker Compose**: Required for containerized setup
 - **Cloudinary Account**: For media storage and management
