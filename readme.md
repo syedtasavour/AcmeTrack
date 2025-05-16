@@ -3,7 +3,7 @@
 ## Project Time
 
 ![Project Time](total-time-spent-on-the-project.jpg)  
-The total time spent on the project is 29 hours and 8 minutes.
+The total time spent on the project is 14 hours and 8 minutes.
 
 ## Prerequisites
 
