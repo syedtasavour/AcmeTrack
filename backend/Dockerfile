@@ -9,6 +9,7 @@ COPY package.json ./
 
 # Install dependencies
 RUN npm install
+EXPOSE 3002
 
 # Copy the rest of the application files to the container
 COPY . .
