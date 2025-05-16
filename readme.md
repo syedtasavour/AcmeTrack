@@ -1,5 +1,10 @@
 ## AcmeTrack is a MERN (MongoDB, Express.js, React, Node.js) stack application
 
+## Project Time
+
+![Project Time](total-time-spent-on-the-project.jpg)  
+The total time spent on the project is 29 hours and 8 minutes.
+
 ## Prerequisites
 
 - **Node.js**: Version 20 or higher (v22 recommended, as per Dockerfile)
@@ -212,3 +217,21 @@ cd acmetrack
 - **MongoDB Connection Issues**: Verify MongoDB is running and the `MONGODB_URI` is correct. For online editors, ensure your cloud MongoDB instance allows connections from your editor’s IP.
 - **CORS Errors**: Check that `CORS_ORIGIN` matches the frontend URL exactly (including `http` vs `https`).
 - **Cloudinary Errors**: Confirm your Cloudinary credentials are valid and not expired.
+
+## 👤 Author
+
+**Syed Tasavour**
+
+- GitHub: [@syedtasavour](https://github.com/syedtasavour)
+- Portfolio: [syedtasavour.me](https://syedtasavour.me)
+
+## 📞 Contact
+
+For any queries or support:
+
+- Email: `help@syedtasavour.me`
+- GitHub Issues: [Create an issue](https://github.com/syedtasavour/backend-VidEngine/issues)
+
+  <div align="center">
+  <sub>Built with passion (and a lot of coffee) by Syed Tasavour.</sub>
+</div>
