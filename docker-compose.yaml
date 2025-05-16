@@ -26,6 +26,7 @@ services:
     container_name: backend-container
     ports:
       - "3002:3002"  # Backend port exposed
+
     env_file:
       - ./backend/.env
     networks:
