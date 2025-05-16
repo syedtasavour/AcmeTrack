@@ -1,13 +1,17 @@
+# Use the official Node.js 22 image as the base image
 FROM node:22
 
-WORKDIR /src
+# Set the working directory in the container
+WORKDIR /app
 
-COPY package*.json ./
+# Copy package.json and package-lock.json files to the container
+COPY package.json ./
+
+# Install dependencies
 RUN npm install
+
+# Copy the rest of the application files to the container
 COPY . .
 
-EXPOSE 3002
-
-CMD ["npm", "start"]
-
-
+# Specify the command to run the application
+CMD ["npm","start"]
