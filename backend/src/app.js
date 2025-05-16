@@ -2,9 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-dotenv.config({
-  path: "./.env",
-});
+dotenv.config();
 const app = express();
 console.log("Environment Variables Loaded", process.env.CORS_ORIGIN),
   app.use(
