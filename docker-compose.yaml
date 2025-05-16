@@ -7,10 +7,11 @@ services:
       dockerfile: Dockerfile
     container_name: react-front-container
     ports:
-      - "5173:5173"                           # Frontend exposed port
+      - "5173:5173"  # Frontend exposed port
     environment:
       - WATCHPACK_POLLING=true
-      - REACT_APP_BACKEND_URL=http://localhost:3002/api/v1  # Backend API base URL for frontend
+    env_file:
+      - ./frontend/.env
     networks:
       - mern-network
     volumes:
@@ -24,18 +25,9 @@ services:
       dockerfile: Dockerfile
     container_name: backend-container
     ports:
-      - "3002:3002"                         # Backend port exposed
-    environment:
-      - PORT=3002
-      - MONGODB_URI=mongodb://mongo:27017
-      - CORS_ORIGIN=http://localhost:5173
-      - ACCESS_TOKEN_SECRET=wtjfJMMJO3BpX3s83FokxV
-      - ACCESS_TOKEN_EXPIRY=15m
-      - REFRESH_TOKEN_SECRET=YYRmZVm2cG8sjGeH2gZWCj
-      - REFRESH_TOKEN_EXPIRY=7d
-      - CLOUDINARY_CLOUD_NAME=devlopment-st
-      - CLOUDINARY_API_KEY=852989835728483
-      - CLOUDINARY_API_SECRET=ICHBu-DLOeHuL1QA9KNmi-bfP7A
+      - "3002:3002"  # Backend port exposed
+    env_file:
+      - ./backend/.env
     networks:
       - mern-network
     volumes:
